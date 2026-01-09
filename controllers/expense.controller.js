@@ -31,14 +31,62 @@ exports.createExpense = async (req, res) => {
 };
 
 
-//for finding 
+// GET EXPENSES WITH PAGINATION + FILTERS + SORTING
 exports.getExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find({ userId: req.userId })
-      .populate("categoryId", "name type")
-      .sort({ date: -1 });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    res.status(200).json(expenses);
+    // base filter
+    const filter = { userId: req.userId };
+
+    // filter by category
+    if (req.query.categoryId) {
+      filter.categoryId = req.query.categoryId;
+    }
+
+    // filter by date range
+    if (req.query.from || req.query.to) {
+      filter.date = {};
+      if (req.query.from) {
+        filter.date.$gte = new Date(req.query.from);
+      }
+      if (req.query.to) {
+        const end = new Date(req.query.to);
+        end.setHours(23, 59, 59, 999);
+        filter.date.$lte = end;
+      }
+    }
+
+    // sorting (SAFE)
+    const sortBy = ["date", "amount"].includes(req.query.sortBy)
+      ? req.query.sortBy
+      : "date";
+
+    const order = req.query.order === "asc" ? 1 : -1;
+
+    const sort = { [sortBy]: order };
+
+    const [expenses, total] = await Promise.all([
+      Expense.find(filter)
+        .populate("categoryId", "name type")
+        .sort(sort)
+        .skip(skip)
+        .limit(limit),
+
+      Expense.countDocuments(filter)
+    ]);
+
+    res.status(200).json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      sortBy,
+      order: order === 1 ? "asc" : "desc",
+      expenses
+    });
 
   } catch (error) {
     res.status(500).json({ message: "Server error" });

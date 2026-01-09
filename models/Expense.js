@@ -32,7 +32,9 @@ const expenseSchema = new mongoose.Schema(
   }
 );
 
+// Core indexes for expense queries
 expenseSchema.index({ userId: 1, date: -1 });
-expenseSchema.index({ categoryId: 1 });
+expenseSchema.index({ userId: 1, categoryId: 1 });
+expenseSchema.index({ userId: 1, amount: -1 });
 
 module.exports = mongoose.model("Expense", expenseSchema);
