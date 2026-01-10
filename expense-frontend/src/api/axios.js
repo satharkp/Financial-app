@@ -1,8 +1,11 @@
+
+
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:4000/api"
+  baseURL: "https://financial-app-g1q4.onrender.com/api"
 });
+
 
 // attach token automatically
 api.interceptors.request.use(config => {
