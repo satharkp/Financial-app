@@ -1,9 +1,14 @@
 const mongoose = require("mongoose");
 
-const expenseSchema = new mongoose.Schema(
+const transactionSchema = new mongoose.Schema(
   {
     amount: {
       type: Number,
+      required: true
+    },
+    type: {
+      type: String,
+      enum: ["income", "expense"],
       required: true
     },
     categoryId: {
@@ -32,9 +37,10 @@ const expenseSchema = new mongoose.Schema(
   }
 );
 
-// Core indexes for expense queries
-expenseSchema.index({ userId: 1, date: -1 });
-expenseSchema.index({ userId: 1, categoryId: 1 });
-expenseSchema.index({ userId: 1, amount: -1 });
+// Core indexes for transaction queries
+transactionSchema.index({ userId: 1, date: -1 });
+transactionSchema.index({ userId: 1, categoryId: 1 });
+transactionSchema.index({ userId: 1, amount: -1 });
+transactionSchema.index({ userId: 1, type: 1, date: -1 });
 
-module.exports = mongoose.model("Expense", expenseSchema);
+module.exports = mongoose.model("transaction", transactionSchema);

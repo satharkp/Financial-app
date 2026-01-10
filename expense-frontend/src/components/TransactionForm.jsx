@@ -1,38 +1,52 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 
-export default function ExpenseForm({ onSuccess }) {
+export default function TransactionForm({ onSuccess }) {
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [type, setType] = useState("expense");
   const [categories, setCategories] = useState([]);
 
   // load categories
   useEffect(() => {
-    api.get("/categories").then(res => {
+    api.get(`/categories?type=${type}`).then(res => {
       setCategories(res.data);
     });
-  }, []);
+  }, [type]);
+
+  useEffect(() => {
+    setCategoryId("");
+  }, [type]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!amount || !categoryId) {
-      alert("Amount and category are required");
+    if (!amount || !categoryId || !type) {
+      alert("Amount, category and type are required");
       return;
     }
 
-    await api.post("/expenses", {
-      amount,
-      categoryId,
-      note
-    });
+    try {
+      await api.post("/transactions", {
+        amount: Number(amount),
+        categoryId,
+        type,
+        note
+      });
 
-    setAmount("");
-    setNote("");
-    setCategoryId("");
+      // reset form
+      setAmount("");
+      setNote("");
+      setCategoryId("");
+      setType("expense");
 
-    if (onSuccess) onSuccess();
+      // refresh dashboard / lists
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add transaction");
+    }
   };
 
   return (
@@ -41,12 +55,12 @@ export default function ExpenseForm({ onSuccess }) {
       className="bg-white rounded-2xl border border-sky-100 shadow-sm p-6 space-y-5"
     >
       <h3 className="text-lg font-semibold text-sky-700">
-        Add Expense
+        Add Transaction
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         
-        {/* Amount */}
+        
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
             Amount
@@ -60,7 +74,22 @@ export default function ExpenseForm({ onSuccess }) {
           />
         </div>
 
-        {/* Category */}
+        
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+            Type
+          </label>
+          <select
+            value={type}
+            onChange={e => setType(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-200"
+          >
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+
+        
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
             Category
@@ -79,7 +108,7 @@ export default function ExpenseForm({ onSuccess }) {
           </select>
         </div>
 
-        {/* Note */}
+        
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
             Note
@@ -98,7 +127,7 @@ export default function ExpenseForm({ onSuccess }) {
           type="submit"
           className="bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition shadow-sm"
         >
-          Add Expense
+          Add Transaction
         </button>
       </div>
     </form>

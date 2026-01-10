@@ -1,40 +1,35 @@
-const Expense = require("../models/Expense");
+const Transaction = require("../modals/Transaction");
 const mongoose = require("mongoose");
 
 // CATEGORY WISE
-exports.categoryWiseExpenses = async (req, res) => {
+exports.categoryWiseTransactions = async (req, res) => {
   try {
-    const result = await Expense.aggregate([
+    const result = await Transaction.aggregate([
       {
         $match: {
-          userId: new mongoose.Types.ObjectId(req.userId)
-        }
-      },
-      {
-        $group: {
-          _id: "$categoryId",
-          totalAmount: { $sum: "$amount" }
+          userId: new mongoose.Types.ObjectId(req.userId),
+          type: "expense"
         }
       },
       {
         $lookup: {
           from: "categories",
-          localField: "_id",
+          localField: "categoryId",
           foreignField: "_id",
           as: "category"
         }
       },
+      { $unwind: "$category" },
       {
-        $unwind: {
-          path: "$category",
-          preserveNullAndEmptyArrays: true
+        $group: {
+          _id: "$category.name",
+          totalAmount: { $sum: "$amount" }
         }
       },
       {
         $project: {
           _id: 0,
-          categoryId: "$_id",
-          categoryName: { $ifNull: ["$category.name", "Unknown"] },
+          category: "$_id",
           totalAmount: 1
         }
       }
@@ -47,9 +42,9 @@ exports.categoryWiseExpenses = async (req, res) => {
 };
 
 // MONTHLY
-exports.monthlyExpenses = async (req, res) => {
+exports.monthlyTransactions = async (req, res) => {
   try {
-    const result = await Expense.aggregate([
+    const result = await Transaction.aggregate([
       {
         $match: {
           userId: new mongoose.Types.ObjectId(req.userId)
@@ -59,7 +54,8 @@ exports.monthlyExpenses = async (req, res) => {
         $group: {
           _id: {
             year: { $year: "$date" },
-            month: { $month: "$date" }
+            month: { $month: "$date" },
+            type: "$type"
           },
           totalAmount: { $sum: "$amount" }
         }
@@ -79,11 +75,10 @@ exports.monthlyExpenses = async (req, res) => {
 };
 
 // DATE RANGE ANALYTICS
-exports.dateRangeExpenses = async (req, res) => {
+exports.dateRangeTransactions = async (req, res) => {
   try {
     const { from, to } = req.query;
 
-    // validate query params
     if (!from || !to) {
       return res.status(400).json({
         message: "from and to dates are required"
@@ -92,14 +87,13 @@ exports.dateRangeExpenses = async (req, res) => {
 
     const startDate = new Date(from);
     const endDate = new Date(to);
-
-    // include full end day
     endDate.setHours(23, 59, 59, 999);
 
-    const result = await Expense.aggregate([
+    const result = await Transaction.aggregate([
       {
         $match: {
           userId: new mongoose.Types.ObjectId(req.userId),
+          type: "expense",
           date: {
             $gte: startDate,
             $lte: endDate
@@ -125,8 +119,43 @@ exports.dateRangeExpenses = async (req, res) => {
     res.status(200).json(
       result[0] || { totalAmount: 0, count: 0 }
     );
-
   } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// NET BALANCE (Income - Expense)
+exports.netBalance = async (req, res) => {
+  try {
+    const result = await Transaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(req.userId),
+          type: { $in: ["income", "expense"] }
+        }
+      },
+      {
+        $group: {
+          _id: "$type",
+          totalAmount: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    let income = 0;
+    let expense = 0;
+
+    result.forEach(r => {
+      if (r._id === "income") income = r.totalAmount;
+      if (r._id === "expense") expense = r.totalAmount;
+    });
+
+    res.json({
+      income,
+      expense,
+      netBalance: income - expense
+    });
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -17,7 +17,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use("/api/categories", require("./routes/category.routes"));
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/protected", require("./routes/protected.routes"));
-app.use("/api/expenses", require("./routes/expense.routes"));
+app.use("/api/transactions", require("./routes/transaction.routes"));
 app.use("/api/analytics", require("./routes/analytics.routes"));
 
 

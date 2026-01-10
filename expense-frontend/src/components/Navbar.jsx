@@ -25,7 +25,11 @@ export default function Navbar() {
             >
               Dashboard
             </Link>
-
+              <Link className={`text-sm font-medium ${
+                location.pathname === "/expenses"
+                  ? "text-sky-400"
+                  : "text-gray-300 hover:text-white"
+              }`} to="/categories">Categories</Link>
             <Link
               to="/expenses"
               className={`text-sm font-medium ${
@@ -35,6 +39,17 @@ export default function Navbar() {
               }`}
             >
               Expenses
+            </Link>
+
+            <Link
+              to="/income"
+              className={`text-sm font-medium ${
+                location.pathname === "/income"
+                  ? "text-green-400"
+                  : "text-gray-300 hover:text-white"
+              }`}
+            >
+              Income
             </Link>
           </div>
         </div>

@@ -1,21 +1,20 @@
-const Category = require("../models/Category");
-const Expense = require("../models/Expense");
+const Category = require("../modals/Category");
+const Expense = require("../modals/Transaction");
 const mongoose = require("mongoose");
 
 // CREATE CATEGORY
 exports.createCategory = async (req, res) => {
   try {
-    const { name, type } = req.body;
+    const { name } = req.body;
 
-    if (!name || !type) {
+    if (!name) {
       return res.status(400).json({
-        message: "Name and type are required"
+        message: "Name is required"
       });
     }
 
     const category = await Category.create({
-      name,
-      type,
+      name: name.trim(),
       userId: req.userId
     });
 

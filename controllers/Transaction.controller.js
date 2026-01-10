@@ -1,19 +1,26 @@
-const Expense = require("../models/Expense");
+const Transaction = require("../modals/Transaction");
 
 
 //for creating
-exports.createExpense = async (req, res) => {
+exports.createTransaction = async (req, res) => {
   try {
-    const { amount, categoryId, note, date } = req.body;
+    const { amount, categoryId, type, note, date } = req.body;
 
-    if (!amount || !categoryId) {
+    if (!amount || !categoryId || !type) {
       return res.status(400).json({
-        message: "Amount and categoryId are required"
+        message: "Amount, categoryId and type are required"
       });
     }
 
-    const expense = await Expense.create({
+    if (!["income", "expense"].includes(type)) {
+      return res.status(400).json({
+        message: "Invalid transaction type"
+      });
+    }
+
+    const transaction = await Transaction.create({
       amount,
+      type,
       categoryId,
       note,
       date,
@@ -21,8 +28,8 @@ exports.createExpense = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "Expense created successfully",
-      expense
+      message: "Transaction created successfully",
+      transaction
     });
 
   } catch (error) {
@@ -32,7 +39,7 @@ exports.createExpense = async (req, res) => {
 
 
 // GET EXPENSES WITH PAGINATION + FILTERS + SORTING
-exports.getExpenses = async (req, res) => {
+exports.getTransactions = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -44,6 +51,11 @@ exports.getExpenses = async (req, res) => {
     // filter by category
     if (req.query.categoryId) {
       filter.categoryId = req.query.categoryId;
+    }
+
+    // filter by transaction type
+    if (req.query.type && ["income", "expense"].includes(req.query.type)) {
+      filter.type = req.query.type;
     }
 
     // filter by date range
@@ -69,13 +81,13 @@ exports.getExpenses = async (req, res) => {
     const sort = { [sortBy]: order };
 
     const [expenses, total] = await Promise.all([
-      Expense.find(filter)
-        .populate("categoryId", "name type")
+      Transaction.find(filter)
+        .populate("categoryId", "name")
         .sort(sort)
         .skip(skip)
         .limit(limit),
 
-      Expense.countDocuments(filter)
+      Transaction.countDocuments(filter)
     ]);
 
     res.status(200).json({
@@ -94,23 +106,23 @@ exports.getExpenses = async (req, res) => {
 };
 
 //to delete
-exports.deleteExpense = async (req, res) => {
+exports.deleteTransaction = async (req, res) => {
   try {
-    const expense = await Expense.findOne({
+    const transaction = await Transaction.findOne({
       _id: req.params.id,
       userId: req.userId
     });
 
-    if (!expense) {
+    if (!transaction) {
       return res.status(404).json({
         message: "Expense not found or not authorized"
       });
     }
 
-    await expense.deleteOne();
+    await transaction.deleteOne();
 
     res.status(200).json({
-      message: "Expense deleted successfully"
+      message: "Transaction deleted successfully"
     });
 
   } catch (error) {
@@ -119,31 +131,40 @@ exports.deleteExpense = async (req, res) => {
 };
 
 // to update expense
-exports.updateExpense = async (req, res) => {
+exports.updateTransaction = async (req, res) => {
   try {
-    const { amount, categoryId, note, date } = req.body;
+    const { amount, categoryId, type, note, date } = req.body;
 
-    const expense = await Expense.findOne({
+    const transaction = await Transaction.findOne({
       _id: req.params.id,
       userId: req.userId 
     });
 
-    if (!expense) {
+    if (!transaction) {
       return res.status(404).json({
         message: "Expense not found or not authorized"
       });
     }
 
-    if (amount !== undefined) expense.amount = amount;
-    if (categoryId) expense.categoryId = categoryId;
-    if (note !== undefined) expense.note = note;
-    if (date) expense.date = date;
+    if (type) {
+      if (!["income", "expense"].includes(type)) {
+        return res.status(400).json({
+          message: "Invalid transaction type"
+        });
+      }
+      transaction.type = type;
+    }
 
-    await expense.save();
+    if (amount !== undefined) transaction.amount = amount;
+    if (categoryId) transaction.categoryId = categoryId;
+    if (note !== undefined) transaction.note = note;
+    if (date) transaction.date = date;
+
+    await transaction.save();
 
     res.status(200).json({
-      message: "Expense updated successfully",
-      expense
+      message: "Transaction updated successfully",
+      transaction
     });
 
   } catch (error) {

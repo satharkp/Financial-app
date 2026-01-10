@@ -4,6 +4,10 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Register";
 import Expenses from "./pages/Expenses";
+import Income from "./pages/Income";
+import Categories from "./pages/Categories";
+
+
 
 export default function App() {
   return (
@@ -11,6 +15,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/income" element={<Income />} />
+        <Route path="/categories" element={<Categories />} />
         <Route
           path="/dashboard"
           element={

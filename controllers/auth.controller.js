@@ -1,15 +1,22 @@
-const User = require("../models/User");
+const User = require("../modals/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const normalizedEmail = email.toLowerCase().trim();
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields required" });
     }
 
-    const existingUser = await User.findOne({ email });
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters"
+      });
+    }
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
@@ -18,7 +25,7 @@ exports.register = async (req, res) => {
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword
     });
 
@@ -37,11 +44,12 @@ exports.login = async (req, res) => {
   try {
     //entering password and email
     const { email, password } = req.body;
+    const normalizedEmail = email.toLowerCase().trim();
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
     }
     //finding user email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -58,7 +66,12 @@ exports.login = async (req, res) => {
     );
     res.status(200).json({
       message: "Login successful",
-      token
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
     });
 
   } catch (error) {
