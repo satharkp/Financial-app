@@ -4,23 +4,32 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
+
+/* -------------------- Middleware -------------------- */
 app.use(express.json());
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
-}));
 
-mongoose.connect(process.env.MONGO_URI)
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true
+  })
+);
+
+/* -------------------- Database -------------------- */
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
+  .catch(err => console.error(err));
 
-app.use("/api/categories", require("./routes/category.routes"));
+/* -------------------- Routes -------------------- */
 app.use("/api/auth", require("./routes/auth.routes"));
-app.use("/api/protected", require("./routes/protected.routes"));
+app.use("/api/categories", require("./routes/category.routes"));
 app.use("/api/transactions", require("./routes/transaction.routes"));
 app.use("/api/analytics", require("./routes/analytics.routes"));
+app.use("/api/protected", require("./routes/protected.routes"));
 
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server running on port ${process.env.PORT || 3000}`);
+/* -------------------- Server -------------------- */
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
