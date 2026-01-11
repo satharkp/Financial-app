@@ -61,26 +61,26 @@ export default function Categories() {
         {/* Add category */}
         <form
           onSubmit={createCategory}
-          className="bg-white rounded-2xl shadow-sm border border-sky-100 p-6 mb-10 flex flex-col md:flex-row gap-4 items-center"
+          className="bg-white rounded-xl shadow-sm border border-sky-100 p-6 mb-10 flex flex-col md:flex-row gap-4 items-center"
         >
           <input
             type="text"
             placeholder="Category name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-sky-50 border border-sky-200 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white transition"
+            className="w-full bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white transition"
           />
 
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="w-full md:w-40 bg-sky-50 border border-sky-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white transition"
+            className="w-full md:w-40 bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white transition"
           >
             <option value="expense">Expense</option>
             <option value="income">Income</option>
           </select>
 
-          <button className="h-[46px] bg-sky-600 text-white px-6 rounded-xl hover:bg-sky-700 transition font-medium shadow-sm">
+          <button className="h-[46px] bg-sky-600 text-white px-6 rounded-lg hover:bg-sky-700 transition font-medium shadow-sm">
             Add
           </button>
         </form>
@@ -89,7 +89,7 @@ export default function Categories() {
         {categories.map(cat => (
           <div
             key={cat._id}
-            className="bg-sky-50 p-5 rounded-2xl border border-sky-100 shadow-sm mb-4 flex justify-between items-center hover:shadow-md transition"
+            className="bg-sky-50 p-5 rounded-xl border border-sky-100 shadow-sm mb-4 flex justify-between items-center hover:shadow-md transition"
           >
             <div className="flex flex-col gap-1">
               <p className="font-medium text-slate-800">{cat.name}</p>
