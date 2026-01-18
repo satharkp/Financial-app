@@ -1,5 +1,5 @@
-const Category = require("../modals/Category");
-const Expense = require("../modals/Transaction");
+const Category = require("../models/Category");
+const Expense = require("../models/Transaction");
 const mongoose = require("mongoose");
 
 // CREATE CATEGORY

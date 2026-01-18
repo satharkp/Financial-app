@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://expense-frontend-five-rouge.vercel.app"
+    "https://fintrack-frontend.vercel.app"
   ],
   credentials: true
 }));

@@ -1,4 +1,4 @@
-const Transaction = require("../modals/Transaction");
+const Transaction = require("../models/Transaction");
 const mongoose = require("mongoose");
 
 // CATEGORY WISE

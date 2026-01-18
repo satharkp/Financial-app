@@ -1,4 +1,4 @@
-const Transaction = require("../modals/Transaction");
+const Transaction = require("../models/Transaction");
 
 
 //for creating
@@ -24,7 +24,7 @@ exports.createTransaction = async (req, res) => {
       categoryId,
       note,
       date,
-      userId: req.userId  
+      userId: req.userId
     });
 
     res.status(201).json({
@@ -137,7 +137,7 @@ exports.updateTransaction = async (req, res) => {
 
     const transaction = await Transaction.findOne({
       _id: req.params.id,
-      userId: req.userId 
+      userId: req.userId
     });
 
     if (!transaction) {

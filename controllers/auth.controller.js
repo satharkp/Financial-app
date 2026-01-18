@@ -1,5 +1,5 @@
-const User = require("../modals/User");
-const Category = require("../modals/Category");
+const User = require("../models/User");
+const Category = require("../models/Category");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -38,7 +38,7 @@ exports.register = async (req, res) => {
     }));
 
     // We use Category model directly here. Need to require it at the top if not present, but better to dynamic require or assume it's available?
-    // Wait, I need to check imports. The file has `const User = require("../modals/User");`.
+    // Wait, I need to check imports. The file has `const User = require("../models/User");`.
     // I need to import Category.
 
     // I'll update the imports in a separate instruction or same block if I can see the top.
@@ -48,7 +48,7 @@ exports.register = async (req, res) => {
     // Let's stick to doing the logic here and I will add the require statement at the top in a second call or same call if possible.
     // Since I can't edit non-contiguous lines, I'll do two calls.
 
-    // Second thought: I'll use `require("../modals/Category")` inside the function or file to be safe? 
+    // Second thought: I'll use `require("../models/Category")` inside the function or file to be safe? 
     // No, standard practice is top level.
 
     // I will replace the LOGIC first.

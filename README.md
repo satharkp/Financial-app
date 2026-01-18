@@ -1,10 +1,10 @@
-# 💰 Expense Tracker – Full Stack MERN App
+# 💰 FinTrack – Full Stack MERN App
 
-A full-stack **Expense & Income Tracker** built using the **MERN stack**, featuring authentication, transactions, analytics, charts, and exports.
+A full-stack **FinTrack** app built using the **MERN stack**, featuring authentication, transactions, analytics, charts, and exports.
 
 🔗 **Live Demo**  
-Frontend: https://expense-frontend-five-rouge.vercel.app  
-Backend API: https://financial-app-g1q4.onrender.com  
+Frontend: https://fintrack-frontend.vercel.app  
+Backend API: https://fintrack-api.onrender.com  
 
 ---
 
@@ -126,7 +126,7 @@ npm run dev
 
 ### Frontend
 
-cd expense-frontend
+cd fintrack-frontend
 npm install
 npm run dev
 
