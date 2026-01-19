@@ -43,4 +43,4 @@ transactionSchema.index({ userId: 1, categoryId: 1 });
 transactionSchema.index({ userId: 1, amount: -1 });
 transactionSchema.index({ userId: 1, type: 1, date: -1 });
 
-module.exports = mongoose.model("transaction", transactionSchema);
+module.exports = mongoose.model("Transaction", transactionSchema);

@@ -30,28 +30,11 @@ exports.register = async (req, res) => {
       password: hashedPassword
     });
 
-    // Seed default categories
     const defaultCategories = ["Food", "Travel", "Utilities", "Other"];
     const categoryDocs = defaultCategories.map(catName => ({
       name: catName,
       userId: user._id
     }));
-
-    // We use Category model directly here. Need to require it at the top if not present, but better to dynamic require or assume it's available?
-    // Wait, I need to check imports. The file has `const User = require("../models/User");`.
-    // I need to import Category.
-
-    // I'll update the imports in a separate instruction or same block if I can see the top.
-    // I can't see the top in this block scope, but I know it's there.
-    // I will do two edits: one for import, one for logic.
-    // Actually, I can use require inside the function or just add it at the top. 
-    // Let's stick to doing the logic here and I will add the require statement at the top in a second call or same call if possible.
-    // Since I can't edit non-contiguous lines, I'll do two calls.
-
-    // Second thought: I'll use `require("../models/Category")` inside the function or file to be safe? 
-    // No, standard practice is top level.
-
-    // I will replace the LOGIC first.
 
     await Category.insertMany(categoryDocs);
 

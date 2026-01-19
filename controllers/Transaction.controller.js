@@ -62,12 +62,19 @@ exports.getTransactions = async (req, res) => {
     if (req.query.from || req.query.to) {
       filter.date = {};
       if (req.query.from) {
-        filter.date.$gte = new Date(req.query.from);
+        const fromDate = new Date(req.query.from);
+        if (isNaN(fromDate.getTime())) {
+          return res.status(400).json({ message: "Invalid 'from' date format" });
+        }
+        filter.date.$gte = fromDate;
       }
       if (req.query.to) {
-        const end = new Date(req.query.to);
-        end.setHours(23, 59, 59, 999);
-        filter.date.$lte = end;
+        const endDate = new Date(req.query.to);
+        if (isNaN(endDate.getTime())) {
+          return res.status(400).json({ message: "Invalid 'to' date format" });
+        }
+        endDate.setHours(23, 59, 59, 999);
+        filter.date.$lte = endDate;
       }
     }
 

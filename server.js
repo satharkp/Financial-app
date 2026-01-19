@@ -3,6 +3,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
+if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
+  console.error("FATAL ERROR: MONGO_URI or JWT_SECRET is not defined in .env file");
+  process.exit(1);
+}
+
 const app = express();
 
 /* -------------------- Middleware -------------------- */
